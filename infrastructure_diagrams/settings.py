@@ -4,7 +4,7 @@ DEFAULT_GLOBAL_GRAPH_ATTRIBUTES = {"label": "", "splines": "true"}
 
 DEFAULT_GROUP_ATTRIBUTES = {}
 
-DEFAULT_NODE_ATTRIBUTES = {"shape": "ellipse", "fillcolor": "white", "style": "filled"}
+DEFAULT_NODE_ATTRIBUTES = {"shape": "box", "fillcolor": "white", "style": "filled"}
 
 DEFAULT_EDGE_ATTRIBUTES = {}
 
