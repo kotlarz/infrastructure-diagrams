@@ -1,0 +1,122 @@
+disable_copyright: false
+graph_attributes:
+  fontsize: 20
+  label: Example Diagram
+graph_engine: dot
+groups:
+- fillcolor: blue
+  id: group4
+  label: 'Group (ID: 4)'
+  nodes:
+  - id: nodeO
+    label: Node O
+  style: filled
+- id: group5
+  label: 'Group (ID: 5)'
+  nodes:
+  - id: nodeF
+    label: Node F
+  parent_group: group2
+- id: group7
+  label: 'Group (ID: 7)'
+  nodes:
+  - id: nodeU
+    label: Node U
+  parent_group: group5
+- id: group3
+  label: 'Group (ID: 3)'
+  nodes:
+  - edges:
+    - label: Edge between I and P
+      node: nodeP
+    id: nodeI
+    label: Node I
+  - edges:
+    - node: node3
+    id: nodeP
+    label: Node P
+  - id: nodeA
+    label: Node A
+  parent_group: group2
+- id: group2
+  label: 'Inner group (ID: 2) of group 1'
+  nodes:
+  - edges:
+    - label: Edge between 3 and 4
+      node: node4
+    - label: Edge between 3 and 8
+      node: node8
+    id: node3
+    label: Node 3
+  - id: node4
+    label: Node 4
+  - edges:
+    - node: node6
+    id: node5
+    label: Node 5
+  - edges:
+    - node: node10
+    id: nodex
+    label: Node X
+  - id: nodey
+    label: Node Y
+  parent_group: group1
+- edge_name: Edge between group 1 and 2
+  endpoint: group2
+  id: group1
+  label: 'Group (ID: 1)'
+  nodes:
+  - edges:
+    - label: Edge between 1 and 2
+      node: node2
+    id: node1
+    label: Node 1
+  - edges:
+    - label: Edge between 2 and 3
+      node: node3
+    id: node2
+    label: Node 2
+  - id: nodez
+    label: Node Z
+- id: group6
+  label: 'Group (ID: 6)'
+  nodes:
+  - id: nodeW
+    label: Node W
+  parent_group: group5
+- id: group8
+  label: 'Group (ID: 8)'
+  nodes:
+  - id: nodeT
+    label: Node T
+  parent_group: group7
+- id: group9
+  label: 'Group (ID: 9)'
+  nodes:
+  - id: nodeE
+    label: Node E
+  parent_group: group4
+- id: group10
+  label: 'Group (ID: 10)'
+- id: group11
+  label: 'Group (ID: 11)'
+  nodes:
+  - edges:
+    - node: node1
+    id: nodeJ
+    label: Node J
+  parent_group: group10
+global_nodes:
+- id: node6
+  label: Node 6
+- id: node7
+- edges:
+  - node: node9
+  id: node8
+- edges:
+  - node: node1
+  id: node9
+- edges:
+  - node: node1
+  id: node10
+  label: Node 10

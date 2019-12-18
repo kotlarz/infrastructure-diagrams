@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+import argparse
+
+from infrastructure_diagrams import graph, utils
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("file", help="path to diagram file")
+    parser.add_argument(
+        "-d",
+        "--display",
+        type=bool,
+        help="display the diagram after rendering",
+        default=False,
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="output path for the diagram, including filetype (.svg, .png, etc.)",
+        default="output.svg",
+    )
+    parser.add_argument(
+        "-r",
+        "--renderer",
+        help="output renderer used for rendering (cairo, gd, etc.)",
+        default="cairo",
+    )
+    args = parser.parse_args()
+
+    diagram = utils.load_diagram(args.file)
+    graph.generate_graph(
+        diagram,
+        options={
+            "display": args.display,
+            "output": args.output,
+            "renderer": args.renderer,
+        },
+    )

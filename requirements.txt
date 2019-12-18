@@ -1,0 +1,4 @@
+graphviz==0.13.2
+PyYAML==5.2
+python-magic==0.4.15
+pypandoc==1.4
