@@ -1,7 +1,7 @@
 graph_attributes:
   # https://www.graphviz.org/doc/info/attrs.html#d:fontsize
   fontsize: 20
-  label: Simple Diagram
+  label: Misc Diagram
 graph_engine: dot
 groups:
 - id: group1
