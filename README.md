@@ -107,5 +107,6 @@ global_nodes:
 ```
 
 Output:
+![Output of misc.yaml](https://raw.githubusercontent.com/kotlarz/infrastructure-diagrams/master/examples/misc.png)
 
 Example diagram configuration files can be found under the [examples/](https://github.com/kotlarz/infrastructure-diagrams/) directory.
