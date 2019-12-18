@@ -10,7 +10,7 @@ except ImportError:
 
 setuptools.setup(
     name="infrastructure-diagrams",
-    version="0.0.2",
+    version="0.0.3",
     author="Marius Kotlarz",
     author_email="marius.kotlarz@gmail.com",
     description="Create infrastructure diagrams from configuration files (YAML and JSON) by using Graphviz",

@@ -29,8 +29,10 @@ def generate_graph(diagram, options={}):
     for key, kwarg in graph_kwargs.items():
         global_graph.attr(**{key: str(kwarg)})
 
-    add_global_nodes(global_graph, diagram["global_nodes"])
-    add_groups(global_graph, diagram["groups"])
+    if "global_nodes" in diagram.keys():
+        add_global_nodes(global_graph, diagram["global_nodes"])
+    if "groups" in diagram.keys():
+        add_groups(global_graph, diagram["groups"])
 
     output = options["output"].split(".")  # TODO: add argument?
     filename = output[0]
