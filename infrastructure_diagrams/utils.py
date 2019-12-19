@@ -91,6 +91,7 @@ def reverse_tree(group, current=[]):
         return current
 
     for child_id, child in group["children"].items():
+        current = reverse_tree(child, current)
         current.append({"id": child_id, "parent": child["parent_group"]})
 
     return current
