@@ -27,7 +27,7 @@ groups:
   label: 'Group (ID: 3)'
   nodes:
   - edges:
-    - label: Edge between I and P
+    - xlabel: Edge between I and P
       node: nodeP
     id: nodeI
     label: Node I
@@ -42,9 +42,9 @@ groups:
   label: 'Inner group (ID: 2) of group 1'
   nodes:
   - edges:
-    - label: Edge between 3 and 4
+    - xlabel: Edge between 3 and 4
       node: node4
-    - label: Edge between 3 and 8
+    - xlabel: Edge between 3 and 8
       node: node8
     id: node3
     label: Node 3
@@ -67,12 +67,12 @@ groups:
   label: 'Group (ID: 1)'
   nodes:
   - edges:
-    - label: Edge between 1 and 2
+    - xlabel: Edge between 1 and 2
       node: node2
     id: node1
     label: Node 1
   - edges:
-    - label: Edge between 2 and 3
+    - xlabel: Edge between 2 and 3
       node: node3
     id: node2
     label: Node 2

@@ -51,7 +51,7 @@
           "edges": [
             {
               "node": "nodeP",
-              "label": "Edge between I and P"
+              "xlabel": "Edge between I and P"
             }
           ]
         },
@@ -81,7 +81,7 @@
           "edges": [
             {
               "node": "node4",
-              "label": "Edge between 3 and 4"
+              "xlabel": "Edge between 3 and 4"
             },
             {
               "node": "node8",
@@ -129,7 +129,7 @@
           "edges": [
             {
               "node": "node2",
-              "label": "Edge between 1 and 2"
+              "xlabel": "Edge between 1 and 2"
             }
           ]
         },

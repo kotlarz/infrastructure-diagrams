@@ -16,12 +16,12 @@ groups:
     label: Node G1_1
     edges:
     - node: G2_1
-      label: Edge between node G1_1 and G2_1
+      xlabel: Edge between node G1_1 and G2_1
       # https://www.graphviz.org/doc/info/attrs.html#d:color
       color: brown
       fontcolor: brown
     - node: global_node_1
-      label: Edge between node G1_1 and global_node_1
+      xlabel: Edge between node G1_1 and global_node_1
 - id: group2
   parent_group: group1
   label: 'Group (ID: 2)'
@@ -46,14 +46,14 @@ groups:
     label: Node G2_3
     edges:
     - node: global_node_2
-      label: Edge between node G2_3 and global_node_2
+      xlabel: Edge between node G2_3 and global_node_2
       color: red
 global_nodes:
 - id: global_node_1
   label: Global Node 1
   edges:
   - node: global_node_2
-    label: Edge between Global node 1 and 2
+    xlabel: Edge between Global node 1 and 2
 - id: global_node_2
   label: Global Node 2
   shape: star

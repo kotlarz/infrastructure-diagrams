@@ -42,71 +42,9 @@ Example:
 
 The configuration files extend the Graphviz [Node, Edge and Graph Attributes](https://www.graphviz.org/doc/info/attrs.html), meaning you can customize the diagram / graph as needed.
 
-Example, `misc.yaml` from the [examples/](https://github.com/kotlarz/infrastructure-diagrams/examples/misc.yaml) directory:
-
-```yaml
-graph_attributes:
-  # https://www.graphviz.org/doc/info/attrs.html#d:fontsize
-  fontsize: 20
-  label: Simple Diagram
-graph_engine: dot
-groups:
-  - id: group1
-    label: "Group (ID: 1)"
-    # https://www.graphviz.org/doc/info/attrs.html#d:style
-    style: filled
-    # https://www.graphviz.org/doc/info/attrs.html#d:fillcolor
-    fillcolor: "#cccccc"
-    nodes:
-      # Group 1 node 1
-      - id: g1_node1
-        label: Node G1_1
-        edges:
-          - node: G2_1
-            label: Edge between node G1_1 and G2_1
-            # https://www.graphviz.org/doc/info/attrs.html#d:color
-            color: brown
-            fontcolor: brown
-          - node: global_node_1
-            label: Edge between node G1_1 and global_node_1
-  - id: group2
-    parent_group: group1
-    label: "Group (ID: 2)"
-    style: filled
-    fillcolor: "#aaaaaa"
-    color: purple
-    nodes:
-      # Group 2 node 1
-      - id: G2_1
-        label: Node G2_1
-        style: filled
-        fillcolor: "#0026ca:#7a7cff"
-        fontcolor: white
-      - id: G2_2
-        label: Node G2_2
-        # https://www.graphviz.org/doc/info/shapes.html
-        shape: box
-        color: green
-        edges:
-          - node: G2_1
-      - id: G2_3
-        label: Node G2_3
-        edges:
-          - node: global_node_2
-            label: Edge between node G2_3 and global_node_2
-            color: red
-global_nodes:
-  - id: global_node_1
-    label: Global Node 1
-    edges:
-      - node: global_node_2
-        label: Edge between Global node 1 and 2
-  - id: global_node_2
-    label: Global Node 2
-    shape: star
-```
+Example output of `example.yaml` from the [examples/](https://github.com/kotlarz/infrastructure-diagrams/examples/example.yaml) directory:
 
 Output:
-![Output of misc.yaml](https://raw.githubusercontent.com/kotlarz/infrastructure-diagrams/master/examples/misc.png)
+![Output of example.yaml](https://raw.githubusercontent.com/kotlarz/infrastructure-diagrams/master/examples/example.png)
 
 Example diagram configuration files can be found under the [examples/](https://github.com/kotlarz/infrastructure-diagrams/) directory.

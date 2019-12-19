@@ -1,6 +1,6 @@
 DEFAULT_GRAPH_ENGINE = "neato"
 
-DEFAULT_GLOBAL_GRAPH_ATTRIBUTES = {"label": "", "splines": "true"}
+DEFAULT_GLOBAL_GRAPH_ATTRIBUTES = {"label": "", "splines": "ortho"}
 
 DEFAULT_GROUP_ATTRIBUTES = {}
 
