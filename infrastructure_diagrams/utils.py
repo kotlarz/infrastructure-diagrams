@@ -52,6 +52,25 @@ def load_diagram(path):
     return config
 
 
+def generate_label(config):
+    label = ""
+    if "label" in config.keys():
+        label = config["label"]
+    elif "title" in config.keys() or "sub_title" in config.keys():
+        if "title" in config.keys():
+            label += f"<{config['title']}"
+
+        if "sub_title" in config.keys():
+            label += " <br/><font point-size='10'><i>config['sub_title']</i></font>>"
+
+        label += ">"
+
+    if label != "":
+        config["label"] = label
+
+    return config
+
+
 def get_from_dict(data_dict, map_list):
     return reduce(operator.getitem, map_list, data_dict)
 
@@ -109,6 +128,8 @@ def add_nodes(global_graph, graph, nodes):
                 continue
             node_kwargs[key] = node[key]
 
+        node_kwargs = generate_label(node_kwargs)
+
         graph.node(node["id"], **node_kwargs)
 
         # Check if the node has an edge, add the edge to the global graph if so.
@@ -156,6 +177,9 @@ def map_group_tree(global_graph, groups):
         group_id = group["id"]
 
         g = Digraph(name=f"cluster_{group_id}")
+
+        group = generate_label(group)
+
         for key in group.keys():
             if key in IGNORE_GROUP_ATTRIBUTES:
                 continue
@@ -214,6 +238,7 @@ def add_groups(global_graph, groups):
     group_tree, group_graphs = map_group_tree(global_graph, groups)
     for group_id, group in group_tree.items():
         queue = []
+        parsed_groups = []
         inner_groups = reverse_tree(group, [])
         for inner_group in inner_groups:
             index = next(
@@ -231,8 +256,15 @@ def add_groups(global_graph, groups):
             else:
                 queue[index]["groups"].append(inner_group["id"])
 
+        root_groups = []
         for item in queue:
             for q_group in item["groups"]:
+                if item["id"] == group_id:
+                    root_groups.append(q_group)
+                    continue
                 group_graphs[item["id"]].subgraph(group_graphs[q_group])
+
+        for root_group in root_groups:
+            group_graphs[group_id].subgraph(group_graphs[root_group])
 
         global_graph.subgraph(group_graphs[group_id])
