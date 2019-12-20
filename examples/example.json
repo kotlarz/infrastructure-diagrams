@@ -8,46 +8,47 @@
   "groups": [
     {
       "id": "group4",
-      "label": "Group (ID: 4)",
+      "title": "Group (ID: 4)",
+      "subtitle": "Example subtitle",
       "fillcolor": "blue",
       "style": "filled",
       "nodes": [
         {
           "id": "nodeO",
-          "label": "Node O"
+          "title": "Node O"
         }
       ]
     },
     {
       "id": "group5",
-      "label": "Group (ID: 5)",
+      "title": "Group (ID: 5)",
       "parent_group": "group2",
       "nodes": [
         {
           "id": "nodeF",
-          "label": "Node F"
+          "title": "Node F"
         }
       ]
     },
     {
       "id": "group7",
-      "label": "Group (ID: 7)",
+      "title": "Group (ID: 7)",
       "parent_group": "group5",
       "nodes": [
         {
           "id": "nodeU",
-          "label": "Node U"
+          "title": "Node U"
         }
       ]
     },
     {
       "id": "group3",
-      "label": "Group (ID: 3)",
+      "title": "Group (ID: 3)",
       "parent_group": "group2",
       "nodes": [
         {
           "id": "nodeI",
-          "label": "Node I",
+          "title": "Node I",
           "edges": [
             {
               "node": "nodeP",
@@ -85,17 +86,17 @@
             },
             {
               "node": "node8",
-              "label": "Edge between 3 and 8"
+              "xlabel": "Edge between 3 and 8"
             }
           ]
         },
         {
           "id": "node4",
-          "label": "Node 4"
+          "title": "Node 4"
         },
         {
           "id": "node5",
-          "label": "Node 5",
+          "title": "Node 5",
           "edges": [
             {
               "node": "node6"
@@ -104,7 +105,7 @@
         },
         {
           "id": "nodex",
-          "label": "Node X",
+          "title": "Node X",
           "edges": [
             {
               "node": "node10"
@@ -113,19 +114,19 @@
         },
         {
           "id": "nodey",
-          "label": "Node Y"
+          "title": "Node Y"
         }
       ]
     },
     {
       "id": "group1",
-      "label": "Group (ID: 1)",
+      "title": "Group (ID: 1)",
       "endpoint": "group2",
       "edge_name": "Edge between group 1 and 2",
       "nodes": [
         {
           "id": "node1",
-          "label": "Node 1",
+          "title": "Node 1",
           "edges": [
             {
               "node": "node2",
@@ -135,65 +136,65 @@
         },
         {
           "id": "node2",
-          "label": "Node 2",
+          "title": "Node 2",
           "edges": [
             {
               "node": "node3",
-              "label": "Edge between 2 and 3"
+              "xlabel": "Edge between 2 and 3"
             }
           ]
         },
         {
           "id": "nodez",
-          "label": "Node Z"
+          "title": "Node Z"
         }
       ]
     },
     {
       "id": "group6",
-      "label": "Group (ID: 6)",
+      "title": "Group (ID: 6)",
       "parent_group": "group5",
       "nodes": [
         {
           "id": "nodeW",
-          "label": "Node W"
+          "title": "Node W"
         }
       ]
     },
     {
       "id": "group8",
-      "label": "Group (ID: 8)",
+      "title": "Group (ID: 8)",
       "parent_group": "group7",
       "nodes": [
         {
           "id": "nodeT",
-          "label": "Node T"
+          "title": "Node T"
         }
       ]
     },
     {
       "id": "group9",
-      "label": "Group (ID: 9)",
+      "title": "Group (ID: 9)",
       "parent_group": "group4",
       "nodes": [
         {
           "id": "nodeE",
-          "label": "Node E"
+          "title": "Node E"
         }
       ]
     },
     {
       "id": "group10",
-      "label": "Group (ID: 10)"
+      "title": "Group (ID: 10)"
     },
     {
       "id": "group11",
-      "label": "Group (ID: 11)",
+      "title": "Group (ID: 11)",
       "parent_group": "group10",
       "nodes": [
         {
           "id": "nodeJ",
-          "label": "Node J",
+          "title": "Node J",
           "edges": [
             {
               "node": "node1"
@@ -206,7 +207,7 @@
   "global_nodes": [
     {
       "id": "node6",
-      "label": "Node 6"
+      "title": "Node 6"
     },
     {
       "id": "node7"
@@ -229,7 +230,7 @@
     },
     {
       "id": "node10",
-      "label": "Node 10",
+      "title": "Node 10",
       "edges": [
         {
           "node": "node1"

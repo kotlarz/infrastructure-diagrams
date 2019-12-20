@@ -52,16 +52,20 @@ def load_diagram(path):
     return config
 
 
-def generate_label(config):
+def generate_label(config, is_group=False):
     label = ""
     if "label" in config.keys():
         label = config["label"]
-    elif "title" in config.keys() or "sub_title" in config.keys():
+    elif "title" in config.keys() or "subtitle" in config.keys():
+        label = "<"
         if "title" in config.keys():
-            label += f"<{config['title']}"
+            if is_group:
+                label += f"<b><u>{config['title']}</u></b>"
+            else:
+                label += f"{config['title']}"
 
-        if "sub_title" in config.keys():
-            label += " <br/><font point-size='10'><i>config['sub_title']</i></font>>"
+        if "subtitle" in config.keys():
+            label += f" <br/><font point-size='10'><i>{config['subtitle']}</i></font>"
 
         label += ">"
 
@@ -178,7 +182,7 @@ def map_group_tree(global_graph, groups):
 
         g = Digraph(name=f"cluster_{group_id}")
 
-        group = generate_label(group)
+        group = generate_label(group, is_group=True)
 
         for key in group.keys():
             if key in IGNORE_GROUP_ATTRIBUTES:

@@ -5,7 +5,10 @@ graph_attributes:
 graph_engine: dot
 groups:
 - id: group1
-  label: 'Group (ID: 1)'
+  # Used instead of label
+  title: 'Group (ID: 1)'
+  # Adds newline to the label
+  subtitle: Subtitle of Group 1
   # https://www.graphviz.org/doc/info/attrs.html#d:style
   style: filled
   # https://www.graphviz.org/doc/info/attrs.html#d:fillcolor
@@ -13,7 +16,7 @@ groups:
   nodes:
   # Group 1 node 1
   - id: g1_node1
-    label: Node G1_1
+    title: Node G1_1
     edges:
     - node: G2_1
       xlabel: Edge between node G1_1 and G2_1
@@ -24,36 +27,36 @@ groups:
       xlabel: Edge between node G1_1 and global_node_1
 - id: group2
   parent_group: group1
-  label: 'Group (ID: 2)'
+  title: 'Group (ID: 2)'
   style: filled
   fillcolor: "#aaaaaa"
   color: purple
   nodes:
   # Group 2 node 1
   - id: G2_1
-    label: Node G2_1
+    title: Node G2_1
     style: filled
     fillcolor: "#0026ca:#7a7cff"
     fontcolor: white
   - id: G2_2
-    label: Node G2_2
+    title: Node G2_2
     # https://www.graphviz.org/doc/info/shapes.html
     shape: box
     color: green
     edges:
     - node: G2_1
   - id: G2_3
-    label: Node G2_3
+    title: Node G2_3
     edges:
     - node: global_node_2
       xlabel: Edge between node G2_3 and global_node_2
       color: red
 global_nodes:
 - id: global_node_1
-  label: Global Node 1
+  title: Global Node 1
   edges:
   - node: global_node_2
     xlabel: Edge between Global node 1 and 2
 - id: global_node_2
-  label: Global Node 2
+  title: Global Node 2
   shape: star
