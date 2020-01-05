@@ -6,19 +6,34 @@ from .settings import (
     DEFAULT_GLOBAL_GRAPH_ATTRIBUTES,
     IGNORE_GRAPH_ATTRIBUTES,
 )
-from .utils import add_global_nodes, add_groups
+from .utils import (
+    add_global_nodes,
+    add_groups,
+    parse_custom_attributes,
+    set_random_primary_colors,
+)
 
 
 def generate_graph(diagram, options={}):
     global_graph = Digraph()
 
+    custom_attributes = {}
+    if "custom_attributes" in diagram:
+        custom_attributes = diagram["custom_attributes"]
+        if (
+            "groups" in diagram
+            and "groups" in custom_attributes
+            and "random_color" in custom_attributes["groups"]
+        ):
+            set_random_primary_colors(diagram["groups"])
+
     # Set global graph attributes
     graph_attributes = {}
-    if "graph_attributes" in diagram.keys():
+    if "graph_attributes" in diagram:
         graph_attributes = diagram["graph_attributes"]
 
     graph_kwargs = DEFAULT_GLOBAL_GRAPH_ATTRIBUTES
-    for key in graph_attributes.keys():
+    for key in graph_attributes:
         if key in IGNORE_GRAPH_ATTRIBUTES:
             continue
         graph_kwargs[key] = graph_attributes[key]
@@ -29,10 +44,10 @@ def generate_graph(diagram, options={}):
     for key, kwarg in graph_kwargs.items():
         global_graph.attr(**{key: str(kwarg)})
 
-    if "global_nodes" in diagram.keys():
-        add_global_nodes(global_graph, diagram["global_nodes"])
-    if "groups" in diagram.keys():
-        add_groups(global_graph, diagram["groups"])
+    if "global_nodes" in diagram:
+        add_global_nodes(global_graph, diagram, custom_attributes)
+    if "groups" in diagram:
+        add_groups(global_graph, diagram["groups"], custom_attributes)
 
     output = options["output"].split(".")  # TODO: add argument?
     filename = output[0]

@@ -2,6 +2,8 @@
 
 infrastructure-diagrams is a python package that allows creating infrastructure diagrams/graphs from configuration files (YAML and JSON). The package utilizes [Graphviz](https://www.graphviz.org/) to generate the diagrams. The functionality is exposed in the command line by the Unix command file.
 
+_Note: Some features are currently undocumented._
+
 ## Requirements
 
 The package requires `python >= 3.6`.
@@ -42,9 +44,15 @@ Example:
 
 The configuration files extend the Graphviz [Node, Edge and Graph Attributes](https://www.graphviz.org/doc/info/attrs.html), meaning you can customize the diagram / graph as needed.
 
-Example output of `example.yaml` from the [examples/](https://github.com/kotlarz/infrastructure-diagrams/examples/example.yaml) directory:
+Examples:
 
-Output:
-![Output of example.yaml](https://raw.githubusercontent.com/kotlarz/infrastructure-diagrams/master/examples/example.png)
+- `example.yaml`
+  ![Output of example.yaml](https://raw.githubusercontent.com/kotlarz/infrastructure-diagrams/master/examples/example.png)
+
+- `misc.yaml`
+  ![Output of misc.yaml](https://raw.githubusercontent.com/kotlarz/infrastructure-diagrams/master/examples/misc.png)
+
+- `iot.yaml`
+  ![Output of iot.yaml](https://raw.githubusercontent.com/kotlarz/infrastructure-diagrams/master/examples/iot.png)
 
 Example diagram configuration files can be found under the [examples/](https://github.com/kotlarz/infrastructure-diagrams/) directory.

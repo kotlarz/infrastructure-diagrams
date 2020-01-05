@@ -1,10 +1,15 @@
 import json
 import operator
 import os
-from functools import reduce
-
 import magic
 import yaml
+from pprint import pprint
+from queue import Queue
+from pprint import pprint
+from SecretColors import Palette
+from functools import reduce
+from .color import darken_color, lighten_color
+from .enums import ComponentType
 
 from graphviz import Digraph
 from .settings import (
@@ -27,6 +32,29 @@ def parse_json(path):
 def parse_yaml(path):
     with open(path) as yaml_file:
         return yaml.load(yaml_file, Loader=yaml.SafeLoader)
+
+
+def split_into_rows(data, columns):
+    return [data[i : i + columns] for i in range(0, len(data), columns)]
+
+
+def set_random_primary_colors(groups):
+    p = Palette("material")
+    random_colors = p.random(no_of_colors=len(groups))
+    i = 0
+    for group in groups:
+        if "color" in group or (
+            "custom_attributes" in group
+            and "primary_color" in group["custom_attributes"]
+        ):
+            continue
+        custom_attributes = {}
+        if "custom_attributes" in group:
+            custom_attributes = group["custom_attributes"]
+
+        custom_attributes["primary_color"] = random_colors[i]
+        group["custom_attributes"] = custom_attributes
+        i += 1
 
 
 def load_diagram(path):
@@ -52,223 +80,239 @@ def load_diagram(path):
     return config
 
 
-def generate_label(config, is_group=False):
+def generate_label(attributes, component_type):
     label = ""
-    if "label" in config.keys():
-        label = config["label"]
-    elif "title" in config.keys() or "subtitle" in config.keys():
-        label = "<"
-        if "title" in config.keys():
-            if is_group:
-                label += f"<b><u>{config['title']}</u></b>"
-            else:
-                label += f"{config['title']}"
+    if "label" in attributes:
+        label = attributes["label"]
+    elif "title" in attributes or "subtitle" in attributes:
+        title_fontsize = attributes.get("title_fontsize", 20)
+        subtitle_fontsize = attributes.get("subtitle_fontsize", 10)
 
-        if "subtitle" in config.keys():
-            label += f" <br/><font point-size='10'><i>{config['subtitle']}</i></font>"
+        label = "<"
+        if "title" in attributes:
+            if component_type == ComponentType.GROUP:
+                label += f"<br/><font point-size='{title_fontsize}'><b><u>{attributes['title']}</u></b></font>"
+            else:
+                label += f"<font point-size='{title_fontsize}'><b>{attributes['title']}</b></font>"
+
+        if "subtitle" in attributes:
+            if component_type == ComponentType.NODE:
+                label += "<br/>"
+
+            label += f"<br/><font point-size='{subtitle_fontsize}'><i>{attributes['subtitle']}</i></font>"
 
         label += ">"
 
     if label != "":
-        config["label"] = label
-
-    return config
+        attributes["label"] = label
 
 
-def get_from_dict(data_dict, map_list):
-    return reduce(operator.getitem, map_list, data_dict)
+def parse_custom_attributes(kwargs, component_type, custom_attributes):
+    # TODO: Convert all the custom attributes and kwargs to strings
+
+    # General attributes
+    if "primary_color" in custom_attributes:
+        primary_color = custom_attributes["primary_color"]
+        if component_type == ComponentType.GROUP and "color" not in kwargs:
+            kwargs["color"] = primary_color
+            kwargs["fontcolor"] = primary_color
+            kwargs["bgcolor"] = lighten_color(primary_color, 185)
+        elif component_type == ComponentType.NODE and "color" not in kwargs:
+            kwargs["style"] = "filled"
+            kwargs["fillcolor"] = lighten_color(primary_color)
+            kwargs["color"] = primary_color
+        elif component_type == ComponentType.EDGE and "color" not in kwargs:
+            kwargs["color"] = primary_color
+            kwargs["fontcolor"] = primary_color
+
+    if component_type == ComponentType.NODE and "nodes" in custom_attributes:
+        # Handle custom attributes for nodes
+        attributes = custom_attributes["nodes"].copy()
+
+        # Parse node color
+        if "color" in attributes and "color" not in kwargs:
+            # Sets the node background color and fades the border to a darker
+            # color
+            color = attributes["color"]
+            kwargs["style"] = "filled"
+            kwargs["fillcolor"] = color
+            kwargs["color"] = str(darken_color(color))
+            del attributes["color"]
+
+        if "border_width" in attributes and "penwidth" not in kwargs:
+            kwargs["penwidth"] = attributes["border_width"]
+            del attributes["border_width"]
+
+        kwargs = {**kwargs, **attributes}
+
+    elif component_type == ComponentType.GROUP and "groups" in custom_attributes:
+        # Handle custom attributes for groups
+        attributes = custom_attributes["groups"].copy()
+
+        # Parse border color
+        if "border_color" in attributes and "color" not in kwargs:
+            kwargs["color"] = str(attributes["border_color"])
+            del attributes["border_color"]
+        if "border_type" in attributes and "style" not in kwargs:
+            kwargs["style"] = attributes["border_type"]
+            del attributes["border_type"]
+        if "border_width" in attributes and "penwidth" not in kwargs:
+            kwargs["penwidth"] = attributes["border_width"]
+            del attributes["border_width"]
+
+        kwargs = {**kwargs, **attributes}
+    elif component_type == ComponentType.EDGE and "edges" in custom_attributes:
+        # Handle custom attributes for edges
+        attributes = custom_attributes["edges"].copy()
+
+        if "width" in attributes and "penwidth" not in kwargs:
+            kwargs["penwidth"] = str(attributes["width"])
+            del attributes["width"]
+
+        kwargs = {**kwargs, **attributes}
+
+    return kwargs
 
 
-def set_in_dict(data_dict, map_list, value):
-    get_from_dict(data_dict, map_list[:-1])[map_list[-1]] = value
+def add_global_nodes(global_graph, group, custom_attributes):
+    group["nodes"] = group["global_nodes"]
+    add_nodes(global_graph, global_graph, group, custom_attributes)
 
 
-# TODO: Find a more efficient way to do this. BFS? DFS?
-def find_group(groups, find_group_id, group_path=[]):
-    if find_group_id in groups.keys():
-        group_path += [find_group_id, "children"]
-        return group_path if len(group_path) > 0 else None
+def add_nodes(global_graph, graph, group, custom_attributes):
+    max_nodes_per_row = None
+    if "max_nodes_per_row" in group:
+        # To split nodes into rows we need to add invisible edges.
+        max_nodes_per_row = group["max_nodes_per_row"]
+        node_rows = split_into_rows(group["nodes"], columns=max_nodes_per_row)
 
-    # Loop through all the keys (group ID's) in the current group
-    for group_id, group in groups.items():
-        sub_path = group_path + [group_id, "children"]
+    a = 4
+    for node in group["nodes"]:
+        if max_nodes_per_row and len(group["nodes"]) > a:
+            edge = {"node": group["nodes"][a]["id"], "style": "invis"}
+            if "edges" in node:
+                node["edges"].append(edge)
+            else:
+                node["edges"] = [edge]
+            a += 1
 
-        # Loop through all the children of the group and see if we can find our
-        # group
-        for child_id, child in group["children"].items():
-            final_path = find_group({child_id: child}, find_group_id, sub_path)
-            if final_path is not None:
-                return final_path
-    return
-
-
-"""
-Reverse traverse through the groups.
-Graphviz requires the subgraph (inner group) to be created before adding it to
-the parent graph (of the inner group).
-"""
-
-
-def reverse_tree(group, current=[]):
-    if len(group["children"]) == 0:
-        return current
-
-    for child_id, child in group["children"].items():
-        current = reverse_tree(child, current)
-        current.append({"id": child_id, "parent": child["parent_group"]})
-
-    return current
-
-
-def add_global_nodes(global_graph, nodes):
-    add_nodes(global_graph, global_graph, nodes)
-
-
-def add_nodes(global_graph, graph, nodes):
-    for node in nodes:
         node_kwargs = DEFAULT_NODE_ATTRIBUTES.copy()
+
+        # Check for custom settings
+        if "custom_attributes" in node:
+            custom_attributes = {**custom_attributes, **node["custom_attributes"]}
+
+        node_kwargs = parse_custom_attributes(
+            node_kwargs, ComponentType.NODE, custom_attributes
+        )
+
+        # Check for node graphviz attributes
         for key in node.keys():
             if key in IGNORE_NODE_ATTRIBUTES:
                 continue
-            node_kwargs[key] = node[key]
+            node_kwargs[key] = str(node[key])
 
-        node_kwargs = generate_label(node_kwargs)
+        generate_label(node_kwargs, ComponentType.NODE)
 
         graph.node(node["id"], **node_kwargs)
 
         # Check if the node has an edge, add the edge to the global graph if so.
-        if "edges" in node.keys():
+        if "edges" in node:
             for edge in node["edges"]:
                 edge_kwargs = DEFAULT_EDGE_ATTRIBUTES.copy()
+
+                # Check for custom settings
+                if "custom_attributes" in edge:
+                    custom_attributes = {
+                        **custom_attributes,
+                        **edge["custom_attributes"],
+                    }
+
+                edge_kwargs = parse_custom_attributes(
+                    edge_kwargs, ComponentType.EDGE, custom_attributes
+                )
 
                 for key in edge.keys():
                     if key in IGNORE_EDGE_ATTRIBUTES:
                         continue
-                    edge_kwargs[key] = edge[key]
+                    edge_kwargs[key] = str(edge[key])
+
                 global_graph.edge(node["id"], edge["node"], **edge_kwargs)
 
 
-"""
-Map the groups into a tree, this is needed to create the graphs in reverse.
-Example:
+def create_group_graph(global_graph, group, custom_attributes):
+    group_graph = Digraph(name=f"cluster_{group['id']}")
 
-Pseudo input:
-    - Group 1, Parent: None
-    - Group 2, Parent: Group 1
-    - Group 3, Parent: Group 2
-    - Group 4, Parent: Group 2
-    - Group 5, Parent: None
-Pseduo output:
-    - Group 1:
-      Children:
-        - Group2:
-          Children:
-            - Group 3:
-              Children: None
-            - Group 4:
-              Children: None
-    - Group 5:
-      Children: None
-"""
+    # Check for custom settings
+    if "custom_attributes" in group:
+        custom_attributes = {**custom_attributes, **group["custom_attributes"]}
+
+    group = parse_custom_attributes(group, ComponentType.GROUP, custom_attributes)
+    generate_label(group, ComponentType.GROUP)
+
+    for key in group.keys():
+        if key in IGNORE_GROUP_ATTRIBUTES:
+            continue
+        group_graph.attr(**{key: str(group[key])})
+
+    if "nodes" in group:
+        add_nodes(global_graph, group_graph, group, custom_attributes)
+
+    return group_graph
 
 
-def map_group_tree(global_graph, groups):
-    group_graphs = {}
-    group_tree = {}
-    queue = {}
+def map_groups_children(groups):
+    group_children = {}
     for group in groups:
-        group["children"] = {}
         group_id = group["id"]
+        if "parent_group" in group:
+            parent_group = group["parent_group"]
+            group_children.setdefault(parent_group, set()).add(group_id)
 
-        g = Digraph(name=f"cluster_{group_id}")
-
-        group = generate_label(group, is_group=True)
-
-        for key in group.keys():
-            if key in IGNORE_GROUP_ATTRIBUTES:
-                continue
-            g.attr(**{key: str(group[key])})
-
-        if "nodes" in group.keys():
-            add_nodes(global_graph, g, group["nodes"])
-        group_graphs[group_id] = g
-
-        # Check if the group has a parent group, if not this group is a global group
-        if "parent_group" not in group:
-            group_tree[group_id] = group
-
-            # Check if group exists in queue
-            group_queue_path = find_group(queue, group_id, [])
-            if group_queue_path:
-                queue_group = get_from_dict(queue, group_queue_path)
-                group_tree[group_id]["children"] = queue_group
-                del queue[group_id]
-            continue
-
-        parent_group = group["parent_group"]
-
-        # Check if parent exists in queue
-        parent_queue_path = find_group(queue, parent_group, [])
-        if parent_queue_path is not None:
-            queue_parent = get_from_dict(queue, parent_queue_path)
-            queue_parent[group_id] = group
-            set_in_dict(queue, parent_queue_path, queue_parent)
-            continue
-
-        # Check if parent exists in tree
-        parent_tree_path = find_group(group_tree, parent_group, [])
-        if parent_tree_path is not None:
-            tree_parent = get_from_dict(group_tree, parent_tree_path)
-            tree_parent[group_id] = group
-            set_in_dict(group_tree, parent_tree_path, tree_parent)
-            continue
-
-        # Check if group exists in queue
-        group_queue_path = find_group(queue, group_id, [])
-        if group_queue_path is not None:
-            queue_group = get_from_dict(queue, group_queue_path)
-            queue[parent_group] = {
-                "children": {group_id: {**group, **{"children": queue_group}}}
-            }
-            del queue[group_id]
-            continue
-
-        if parent_group not in queue:
-            queue[parent_group] = {"children": {group_id: group}}
-    return group_tree, group_graphs
+        group_children[group_id] = group_children.get(group_id, set())
+    return group_children
 
 
-def add_groups(global_graph, groups):
-    group_tree, group_graphs = map_group_tree(global_graph, groups)
-    for group_id, group in group_tree.items():
-        queue = []
-        parsed_groups = []
-        inner_groups = reverse_tree(group, [])
-        for inner_group in inner_groups:
-            index = next(
-                (
-                    i
-                    for i, item in enumerate(queue)
-                    if item["id"] == inner_group["parent"]
-                ),
-                None,
-            )
-            if index is None:
-                queue.append(
-                    {"id": inner_group["parent"], "groups": [inner_group["id"]]}
-                )
+def add_groups(global_graph, groups, custom_attributes):
+    groups_children = map_groups_children(groups)
+    group_graphs = {}
+    queue = Queue()
+
+    # Add all the groups to the queue.
+    for group in groups:
+        group_id = group["id"]
+        group_graphs[group_id] = create_group_graph(
+            global_graph, group, custom_attributes
+        )
+        queue.put(group)
+
+    """
+    Go through the queue and check if group has children (`groups_children`, i.e. sub-groups).
+    If the group has children:
+        - Check if each child has been processed already (they exists in processed_groups).
+        - If one of the children have not been processed, add the group back
+          into the queue.
+    If all the children have been processed (or the group has no children), add the group
+    graph to the parent group graph. If the group has no parent, add it to the global graph.
+    """
+    processed_groups = set()
+    while not queue.empty():
+        group = queue.get()
+        group_id = group["id"]
+        group_children = groups_children[group_id]
+
+        # Check if ALL of the children have been processed.
+        if group_children.issubset(processed_groups):
+            processed_groups.add(group_id)
+            if "parent_group" not in group:
+                global_graph.subgraph(group_graphs[group_id])
             else:
-                queue[index]["groups"].append(inner_group["id"])
-
-        root_groups = []
-        for item in queue:
-            for q_group in item["groups"]:
-                if item["id"] == group_id:
-                    root_groups.append(q_group)
-                    continue
-                group_graphs[item["id"]].subgraph(group_graphs[q_group])
-
-        for root_group in root_groups:
-            group_graphs[group_id].subgraph(group_graphs[root_group])
-
-        global_graph.subgraph(group_graphs[group_id])
+                parent_id = group["parent_group"]
+                parent_graph = group_graphs[parent_id]
+                group_graphs[parent_id].subgraph(group_graphs[group_id])
+        else:
+            """
+            Some children of the group have not been processed yet.
+            Add the group back to the queue.
+            """
+            queue.put(group)

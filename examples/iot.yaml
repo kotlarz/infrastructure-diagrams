@@ -1,0 +1,498 @@
+graph_attributes:
+    label: IoT infrastructure
+    splines: 'ortho'
+    fontsize: 100
+    margin: 2
+    rankdir: "RL"
+    dpi: 100
+    ranksep: "1.5"
+    nodesep: ".5"
+    compound: "true"
+
+# Custom variables
+custom_attributes:
+    nodes:
+        title_fontsize: "60"
+        subtitle_fontsize: "40"
+        margin: "0.2"
+        border_width: "1.5"
+        fontcolor: white
+        width: "12"
+        height: "2.2"
+    groups:
+        title_fontsize: "88"
+        subtitle_fontsize: "50"
+        margin: "30"
+        border_width: "5.0"
+        max_nodes_per_row: 4
+    edges:
+        width: "1.5"
+
+groups:
+#====================================================
+# Internet
+#====================================================
+- id: internet
+  title: 'Internet'
+  style: "solid"
+  penwidth: "6.0"
+  custom_attributes:
+    primary_color: "#D50000"
+  nodes:
+    - id: uptime_robot
+      title: Uptime Robot
+      subtitle: "api.uptimerobot.com/v2/getMonitors"
+    - id: bus_api
+      title: Bus API
+      subtitle: "api.examle.io/api/v1"
+    - id: firebase
+      title: Google Firebase
+    - id: github_api
+      title: GitHub API
+      subtitle: "api.github.com/graphql"
+    - id: slack
+      title: Slack
+
+#====================================================
+# University
+#====================================================
+- id: university
+  title: 'University'
+  style: "solid"
+  penwidth: "6.0"
+
+#####################################################
+# SERVER ROOM
+#####################################################
+- id: server_room
+  parent_group: university
+  title: 'Server Room'
+  style: "solid"
+  penwidth: "5.0"
+  custom_attributes:
+    primary_color: "#673AB7"
+
+#----------------------------------------------------
+# SERVER ROOM - DATABASES
+#----------------------------------------------------
+- id: server_databases
+  parent_group: server_room
+  title: 'databases.kotlarz.dev'
+  custom_attributes:
+    primary_color: "#2196F3"
+
+#----------------------------------------------------
+# SERVER ROOM - DATABASES - POSTGRESQL
+#----------------------------------------------------
+- id: server_databases_postgresql
+  parent_group: server_databases
+  title: 'PostgreSQL'
+  custom_attributes:
+    primary_color: "#F44336"
+  nodes:
+      - id: databases_postgresql_fridge
+        title: 'Fridge'
+
+
+#####################################################
+# KUBERNETES
+#####################################################
+- id: kubernetes
+  parent_group: server_room
+  title: 'Kubernetes Namespaces'
+  custom_attributes:
+    primary_color: "#3F51B5"
+
+#----------------------------------------------------
+# KUBERNETES - PRODUCTION
+#----------------------------------------------------
+- id: kubernetes_production
+  parent_group: kubernetes
+  title: 'Production'
+  custom_attributes:
+    primary_color: "#2196F3"
+  nodes:
+    - id: member_dashboard
+      title: Member Dashboard
+      subtitle: "dashboard.kotlarz.dev"
+      edges:
+        - node: fridge
+        - node: presence_api
+        - node: environment_api
+        - node: coffee_api
+        - node: office_door_api
+        - node: office_chromecast_api
+        - node: github_stats
+        - node: uptime_robot
+    - id: information_dashboard
+      title: information_dashboard
+      subtitle: "information_dashboard.kotlarz.dev"
+      edges:
+        - node: member_dashboard
+        - node: bus_api
+        - node: website_api
+    - id: website_api
+      title: Website API
+      subtitle: "website.kotlarz.dev"
+    - id: fridge
+      title: Fridge
+      subtitle: "fridge.kotlarz.dev"
+      edges:
+        - node: databases_postgresql_fridge
+        - node: slack
+        - node: mqtt_notification
+    - id: maas
+      title: MaaS
+      subtitle: Members as a Service
+    - id: slack_bot
+      title: SlackBot
+      subtitle: Hubot
+      edges:
+        - node: slack
+          dir: both
+        - node: maas
+        - node: fridge
+        - node: presence_api
+        - node: firebase
+    - id: github_stats_service
+      title: GitHub Stats Service
+      edges:
+        - node: github_api
+        - node: influxdb
+    - id: coffee_listener
+      title: Coffee Listener
+      edges:
+        - node: mqtt_coffee_tracker
+        - node: office_coffee_tracker
+        - node: slack
+
+#----------------------------------------------------
+# KUBERNETES - OpenFaaS
+#----------------------------------------------------
+- id: openfaas
+  parent_group: kubernetes
+  title: OpenFaaS
+  subtitle: "openfaas.kotlarz.dev"
+  custom_attributes:
+    primary_color: "#4CAF50"
+  nodes:
+    # First row
+    - id: presence_api
+      title: Presence API
+      subtitle: "presence.kotlarz.dev"
+      edges:
+        - node: influxdb
+          dir: back
+    - id: environment_api
+      title: Environment API
+      subtitle: "environment-api.kotlarz.dev"
+      edges:
+        - node: influxdb
+          dir: back
+    - id: coffee_api
+      title: Coffee API
+      subtitle: "coffee-api.kotlarz.dev"
+      edges:
+        - node: influxdb
+          dir: back
+    - id: office_door_api
+      title: Office Door API
+      subtitle: "office-door-api.kotlarz.dev"
+      edges:
+        - node: influxdb
+          dir: back
+    # Second row
+    - id: office_chromecast_api
+      title: Office Chromecast API
+      subtitle: "office-chromecast-api.kotlarz.dev"
+      edges:
+        - node: influxdb
+          dir: back
+    - id: github_stats
+      title: GitHub Stats
+      subtitle: "github-stats.kotlarz.dev"
+      edges:
+        - node: influxdb
+          dir: back
+    - id: office_couch_api
+      title: Office Couch API
+      subtitle: "functions/office-couch-api"
+      edges:
+        - node: mqtt_office_couch
+    - id: office_lasers_api
+      title: Office Lasers API
+      subtitle: "functions/office-lasers-api"
+      edges:
+        - node: mqtt_office_lasers
+
+#----------------------------------------------------
+# KUBERNETES - EMQX
+#----------------------------------------------------
+- id: kubernetes_emqx
+  parent_group: kubernetes
+  title: 'EMQX'
+  custom_attributes:
+    primary_color: "#4CAF50"
+
+#----------------------------------------------------
+# KUBERNETES - EMQX - MQTT
+#----------------------------------------------------
+- id: kubernetes_emqx_mqtt
+  parent_group: kubernetes_emqx
+  title: 'MQTT Broker'
+  subtitle: mqtt.kotlarz.dev
+  custom_attributes:
+    primary_color: "#FF9800"
+  width: "5"
+  height: "2"
+  nodes:
+    # First row
+    - id: mqtt_emergency_button
+      title: "emergency_button/#"
+    - id: mqtt_office_speaker
+      title: "office_speaker/#"
+    - id: mqtt_office_door
+      title: "office_door/#"
+    - id: mqtt_office_couch
+      title: "office_couch/#"
+    # Second row
+    - id: mqtt_office_lights
+      title: "office_lights/#"
+    - id: mqtt_office_lasers
+      title: "office_lasers/#"
+    - id: mqtt_office_chromecast
+      title: "office_chromecast/#"
+    - id: mqtt_coffee_register
+      title: "coffee_register/#"
+    # Third row
+    - id: mqtt_coffee_tracker
+      title: "coffee_tracker/#"
+    - id: mqtt_notification
+      title: "notification/#"
+    - id: mqtt_fridge_register
+      title: "fridge_register/#"
+    - id: mqtt_fridge
+      title: "fridge/#"
+    # Fourth row
+    - id: mqtt_presence
+      title: "presence/#"
+    - id: mqtt_environment_sensors
+      title: "sensors/#"
+
+#----------------------------------------------------
+# KUBERNETES - INFLUX
+#----------------------------------------------------
+- id: kubernetes_influx
+  parent_group: kubernetes
+  title: 'Influx'
+  custom_attributes:
+    primary_color: "#673AB7"
+  nodes:
+    - id: influxdb
+      title: InfluxDB
+    - id: telegraf
+      title: Telegraf
+      edges:
+          - node: influxdb
+          - node: mqtt_office_lasers
+            dir: back
+
+#====================================================
+# OFFICE
+#====================================================
+- id: office
+  parent_group: university
+  title: Office
+  style: "solid"
+  penwidth: "5.0"
+  custom_attributes:
+    primary_color: "#2E7D32"
+  nodes:
+    - id: office_device_chromecast
+      title: Chromecast
+      subtitle: "192.168.1.70"
+    - id: office_device_coffee_power_sensor
+      title: Coffee Sensor
+      subtitle: "192.168.1.71"
+    - id: office_device_nexus_pad
+      title: Nexus Tablet
+      subtitle: "192.168.1.72"
+      edges:
+          - node: mqtt_fridge
+    - id: office_device_environment_sensors
+      title: Environment sensors
+      subtitle: "192.168.1.73"
+      edges:
+          - node: mqtt_environment_sensors
+    - id: office_device_power_plug_1
+      title: Power plug 1
+      subtitle: "192.168.1.74"
+    - id: office_device_power_plug_2
+      title: Power plug 2
+      subtitle: "192.168.1.75"
+    - id: office_device_power_plug_3
+      title: Power plug 3
+      subtitle: "192.168.1.76"
+    - id: office_device_led_strip
+      title: LED strip
+      subtitle: "192.168.1.77"
+    - id: office_door
+      title: Office Door
+      subtitle: "192.168.1.88"
+      edges:
+          - node: mqtt_office_door
+
+#----------------------------------------------------
+# OFFICE - PI - 1
+#----------------------------------------------------
+- id: office_pi_1
+  parent_group: office
+  title: "Office PI #1"
+  subtitle: "192.168.1.50"
+  custom_attributes:
+    primary_color: "#00BCD4"
+  nodes:
+  - id: office_emergency_button
+    title: emergency_button
+    edges:
+        - node: mqtt_emergency_button
+  edges:
+      - group: office_pi_2
+
+#----------------------------------------------------
+# OFFICE - PI - 2
+#----------------------------------------------------
+- id: office_pi_2
+  parent_group: office
+  title: "Office PI #2"
+  subtitle: "192.168.1.51"
+  custom_attributes:
+    primary_color: "#009688"
+  nodes:
+    - id: office_coffee_registration
+      title: coffee_registration
+      edges:
+          - node: mqtt_coffee_register
+    - id: office_coffee_registration_reader
+      title: RFID Reader
+      edges:
+          - node: office_coffee_registration
+    - id: office_coffee_tracker
+      title: coffee_tracker
+      edges:
+          - node: mqtt_coffee_tracker
+          - node: office_device_coffee_power_sensor
+
+#----------------------------------------------------
+# OFFICE - PI - 3
+#----------------------------------------------------
+- id: office_pi_3
+  parent_group: office
+  title: "Office PI #3"
+  subtitle: "192.168.1.52"
+  custom_attributes:
+    primary_color: "#9E9E9E"
+  nodes:
+    - id: office_paaf
+      title: paaf
+
+#----------------------------------------------------
+# OFFICE - PI - 4
+#----------------------------------------------------
+- id: office_pi_4
+  parent_group: office
+  title: "Office PI #4"
+  subtitle: "192.168.1.53"
+  custom_attributes:
+    primary_color: "#8BC34A"
+  nodes:
+    - id: office_fridge_registration
+      title: fridge_registration
+      edges:
+      - node: mqtt_fridge_register
+      - node: mqtt_fridge
+    - id: office_fridge_registration_reader
+      title: NFC Reader
+      edges:
+        - node: office_fridge_registration
+#----------------------------------------------------
+# OFFICE - PI - TV
+#----------------------------------------------------
+- id: office_pi_tv
+  parent_group: office
+  title: "Office PI - TV"
+  subtitle: "192.168.1.54"
+  custom_attributes:
+    primary_color: "#9C27B0"
+  nodes:
+    - id: office_speaker
+      title: office_speaker
+      edges:
+          - node: mqtt_office_speaker
+    - id: office_pi_tv_dashboard
+      title: Member Dashboard
+      edges:
+          - node: member_dashboard
+
+
+#----------------------------------------------------
+# OFFICE - SURFACE
+#----------------------------------------------------
+- id: surface
+  parent_group: office
+  title: Surface
+  subtitle: "192.168.1.10"
+  custom_attributes:
+    primary_color: "#607D8B"
+  nodes:
+    - id: office_chromecast
+      title: office_chromecast
+      edges:
+          - node: office_device_chromecast
+          - node: mqtt_office_chromecast
+    - id: office_couch
+      title: office_couch
+      edges:
+          - node: office_device_led_strip
+          - node: mqtt_office_couch
+    - id: office_lasers
+      title: office_lasers
+      edges:
+          - node: office_device_power_plug_1
+          - node: mqtt_office_lasers
+    - id: office_lights
+      title: office_lights
+      edges:
+          - node: office_device_power_plug_2
+          - node: mqtt_office_lights
+    - id: office_presence_wifi
+      title: presence_wifi_listener
+      edges:
+          - node: mqtt_presence
+    - id: office_presence_bt
+      title: presence_bt_listener
+      edges:
+          - node: mqtt_presence
+    - id: office_welcome
+      title: office_welcome
+      edges:
+          - node: mqtt_presence
+            dir: back
+          - node: mqtt_office_speaker
+            dir: forward
+
+#----------------------------------------------------
+# OFFICE - INFORMATION_MONITOR
+#----------------------------------------------------
+- id: information_monitor
+  parent_group: office
+  title: Information Monitor
+  subtitle: "192.168.1.11"
+  custom_attributes:
+    primary_color: "#E91E63"
+  nodes:
+    - id: information_os
+      title: Chilikiosk
+      edges:
+          - node: information_dashboard
+

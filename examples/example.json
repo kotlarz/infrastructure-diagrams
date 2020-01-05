@@ -51,8 +51,7 @@
           "title": "Node I",
           "edges": [
             {
-              "node": "nodeP",
-              "xlabel": "Edge between I and P"
+              "node": "nodeP"
             }
           ]
         },
@@ -122,15 +121,13 @@
       "id": "group1",
       "title": "Group (ID: 1)",
       "endpoint": "group2",
-      "edge_name": "Edge between group 1 and 2",
       "nodes": [
         {
           "id": "node1",
           "title": "Node 1",
           "edges": [
             {
-              "node": "node2",
-              "xlabel": "Edge between 1 and 2"
+              "node": "node2"
             }
           ]
         },
@@ -139,8 +136,7 @@
           "title": "Node 2",
           "edges": [
             {
-              "node": "node3",
-              "xlabel": "Edge between 2 and 3"
+              "node": "node3"
             }
           ]
         },
