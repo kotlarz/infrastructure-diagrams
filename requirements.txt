@@ -1,5 +1,5 @@
 graphviz==0.13.2
-PyYAML==5.2
+PyYAML==5.4
 python-magic==0.4.15
 pypandoc==1.4
 colour==0.1.5
